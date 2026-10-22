@@ -18,8 +18,10 @@ describe('ForecastClient URL', () => {
   it('P6: contiene latitude, longitude y current con las 3 variables', () => {
     fc.assert(fc.property(fc.double({ min: -90, max: 90, noNaN: true }), fc.double({ min: -180, max: 180, noNaN: true }), (lat, lon) => {
       const url = new URL(buildForecastUrl(lat, lon));
-      expect(Number(url.searchParams.get('latitude'))).toBe(lat);
-      expect(Number(url.searchParams.get('longitude'))).toBe(lon);
+      // Igualdad numérica (===): -0 y +0 son la misma coordenada. fast-check halló el
+      // contraejemplo [-0, 0] con toBe (Object.is) en el checkpoint 6.
+      expect(Number(url.searchParams.get('latitude')) === lat).toBe(true);
+      expect(Number(url.searchParams.get('longitude')) === lon).toBe(true);
       expect(url.searchParams.get('current')).toBe('temperature_2m,relative_humidity_2m,precipitation');
     }));
   });
