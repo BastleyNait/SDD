@@ -1,5 +1,7 @@
 # Documento de Diseño Técnico
 
+> **Versión:** 1.1 (22-10-2026) — cambios respecto a 1.0: parámetro `language=es` en geocodificación; `Coordinates` incorpora `region` y `country`; nueva función pura `formatLocation`; propiedades 14 y 15; pruebas de contrato con respuestas reales de Open-Meteo.
+
 ## Introducción
 
 Este documento describe el diseño técnico de la aplicación web **weather-forecast-app**. La aplicación permite al usuario ingresar el nombre de una ciudad y obtener el pronóstico climático actual (temperatura, humedad y precipitaciones), utilizando las APIs públicas y gratuitas de [Open-Meteo](https://open-meteo.com).
@@ -90,6 +92,7 @@ La arquitectura sigue el patrón **Separación de Responsabilidades** en capas c
 - Aplica el formateo numérico: temperatura y precipitación a máximo 1 decimal; humedad como entero.
 - Se limpia al inicio de cada nueva búsqueda.
 - Muestra el nombre ingresado por el usuario como fallback si la Geocoding API no retorna un nombre.
+- (v1.1) Muestra el `Location_Label` construido por `formatLocation(cityName, region, country)` en `src/utils/location.ts`.
 
 #### `LoadingIndicator`
 - Componente simple que se muestra/oculta según el estado de la solicitud en curso.
@@ -106,6 +109,8 @@ interface Coordinates {
   latitude: number;
   longitude: number;
   cityName: string; // nombre retornado por la Geocoding API
+  region: string;   // admin1 retornado por la API ('' si no viene)   (v1.1)
+  country: string;  // country retornado por la API ('' si no viene)  (v1.1)
 }
 
 type GeocodingResult = 
@@ -153,6 +158,7 @@ interface ForecastService {
 - Orquesta el flujo completo: valida la entrada, llama a `GeocodingService`, luego a `ForecastService`, y actualiza el estado de la UI.
 - Gestiona el estado de carga (`isLoading`), errores y datos del clima.
 - Limpia el `WeatherDisplay` al iniciar cada nueva búsqueda.
+- (v1.1) Asigna un identificador incremental a cada búsqueda; cuando llega una respuesta cuyo identificador no es el último, la descarta (Req. 4.8).
 
 ---
 
@@ -189,6 +195,10 @@ La API retorna un objeto JSON con la siguiente estructura:
 | `results[0].latitude`   | `latitude`       | Sin modificación       |
 | `results[0].longitude`  | `longitude`      | Sin modificación       |
 | `results[0].name`       | `cityName`       | Sin modificación       |
+| `results[0].admin1`     | `region`         | Sin modificación (v1.1)|
+| `results[0].country`    | `country`        | Sin modificación (v1.1)|
+
+URL (v1.1): `https://geocoding-api.open-meteo.com/v1/search?name={nombre}&count=1&language=es`
 
 ### Respuesta de la Forecast API
 
@@ -201,7 +211,7 @@ https://api.open-meteo.com/v1/forecast
   &current=temperature_2m,relative_humidity_2m,precipitation
 ```
 
-> **Nota:** El parámetro moderno de la API usa `relative_humidity_2m` (con guion bajo completo). El requirements.md usa el nombre legacy `relativehumidity_2m`; en la implementación se usará el nombre actual de la API para garantizar compatibilidad.
+> **Nota:** El parámetro de la API es `relative_humidity_2m`. En la v1.0 el requirements.md usaba el nombre legacy `relativehumidity_2m`; en la v1.1 ambos documentos quedaron alineados.
 
 La API retorna:
 
@@ -284,7 +294,7 @@ type AppState =
 
 ### Property 3: Construcción correcta de la URL de Geocodificación
 
-*Para cualquier* nombre de ciudad no vacío, la URL construida para la solicitud a la Geocoding API DEBERÁ contener el nombre URL-encoded como parámetro `name` y el parámetro `count=1`.
+*Para cualquier* nombre de ciudad no vacío, la URL construida para la solicitud a la Geocoding API DEBERÁ contener el nombre URL-encoded como parámetro `name`, el parámetro `count=1` y (v1.1) `language=es`.
 
 **Validates: Requirements 2.1**
 
@@ -367,6 +377,22 @@ type AppState =
 *Para cualquier* estado del `Weather_Display` que contenga datos de una búsqueda previa, al iniciar una nueva búsqueda, el contenido del `Weather_Display` DEBERÁ estar limpio antes de que llegue la respuesta de la nueva solicitud a la Forecast API.
 
 **Validates: Requirements 4.6**
+
+---
+
+### Property 14: Etiqueta de ubicación (v1.1)
+
+*Para cualquier* combinación de `cityName`, `region` y `country`, `formatLocation` DEBERÁ: comenzar con el nombre de la ciudad; contener la región solo si no está vacía y es distinta del nombre; contener el país solo si no está vacío; y unir las partes presentes con «, » sin dejar separadores vacíos.
+
+**Validates: Requirements 4.9**
+
+---
+
+### Property 15: Descarte de respuestas obsoletas (v1.1)
+
+*Para cualquier* par de búsquedas A y B donde B se inicia antes de que A termine, y para cualquier orden de llegada de sus respuestas, el `Weather_Display` y el mensaje de error finales DEBERÁN corresponder exclusivamente a la búsqueda B.
+
+**Validates: Requirements 4.8**
 
 ---
 
@@ -478,6 +504,12 @@ Cada propiedad de corrección definida en este documento se implementa como una 
 | P11: Formateo numérico | Valores `number` arbitrarios (incluyendo decimales) | fast-check |
 | P12: Weather_Display contiene campos | Objetos `WeatherData` arbitrarios válidos | fast-check |
 | P13: Limpieza de display | Cualquier estado previo de `WeatherDisplay` | fast-check |
+| P14: Etiqueta de ubicación (v1.1) | Tripletas de strings (incluye vacíos y región = ciudad) | fast-check |
+| P15: Respuestas obsoletas (v1.1) | Orden de llegada A/B y resultados éxito/error arbitrarios | fast-check |
+
+#### Pruebas de contrato (v1.1)
+
+Respuestas reales de Open-Meteo capturadas el 22-10-2026 (`tests/fixtures/`) se pasan por los servicios para verificar que el parseo funciona con el formato real de la API, no solo con datos sintéticos.
 
 #### Pruebas de Ejemplo (Unit Tests)
 
