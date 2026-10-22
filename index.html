@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pronóstico del clima</title>
+  </head>
+  <body>
+    <main>
+      <h1>Pronóstico del clima</h1>
+      <section id="search" aria-label="Búsqueda"></section>
+      <div id="loading" hidden></div>
+      <div id="error"></div>
+      <section id="weather-display" aria-live="polite"></section>
+      <footer>Datos: <a href="https://open-meteo.com">Open-Meteo</a></footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
