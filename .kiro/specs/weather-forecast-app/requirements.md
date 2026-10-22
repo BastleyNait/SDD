@@ -1,6 +1,6 @@
 # Requirements Document
 
-> **Versión:** 1.1 · **Estado:** aprobado por Sebastián Chirinos (22-10-2026)
+> **Versión:** 1.2 · **Estado:** aprobado por Sebastián Chirinos (22-10-2026)
 >
 > | Versión | Cambio | Motivo |
 > |---|---|---|
@@ -9,6 +9,7 @@
 > | 1.1 | Req 3.1: `relativehumidity_2m` → `relative_humidity_2m` | El nombre antiguo no coincide con la API vigente (inconsistencia detectada entre requirements y design) |
 > | 1.1 | Nuevo Req 4.8 (respuestas obsoletas) | Hueco detectado en implementación: dos búsquedas seguidas podían mostrar el resultado de la primera |
 > | 1.1 | Nuevo Req 4.9 (país y región) | Ciudades homónimas: «San José» devuelve San José (California, EE. UU.), no Costa Rica |
+> | 1.2 | Nuevo Req 1.7 (limpiar error previo al fallar la validación) | Defecto hallado en la prueba en vivo: se mostraban a la vez «El nombre de la ciudad es obligatorio» y el error de la búsqueda anterior |
 
 ## Introduction
 
@@ -42,6 +43,7 @@ Esta feature describe una aplicación web que permite al usuario ingresar el nom
 4. CUANDO el User active el botón de envío con un City_Input que contenga solo espacios en blanco, LA App DEBERÁ mostrar un mensaje de validación indicando que el nombre de la ciudad es obligatorio.
 5. CUANDO el User active el botón de envío con un City_Input no vacío, LA App DEBERÁ iniciar la solicitud de geocodificación a la Geocoding_API usando el valor recortado de City_Input y DEBERÁ mostrar un indicador de carga hasta que se reciba una respuesta.
 6. SI la solicitud de geocodificación retorna un error o ningún resultado, ENTONCES LA App DEBERÁ mostrar el mensaje de error correspondiente y City_Input DEBERÁ permanecer accesible para que el User pueda ingresar un nuevo nombre de ciudad.
+7. CUANDO el User active el botón de envío y la validación falle (City_Input vacío o con solo espacios), LA App DEBERÁ ocultar cualquier mensaje de error de una búsqueda anterior, de modo que el único mensaje visible sea el de validación; EL Weather_Display DEBERÁ conservar el último resultado válido, si existe. *(v1.2)*
 
 ---
 

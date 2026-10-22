@@ -1,6 +1,7 @@
 # Documento de Diseño Técnico
 
-> **Versión:** 1.1 (22-10-2026) — cambios respecto a 1.0: parámetro `language=es` en geocodificación; `Coordinates` incorpora `region` y `country`; nueva función pura `formatLocation`; propiedades 14 y 15; pruebas de contrato con respuestas reales de Open-Meteo.
+> **Versión:** 1.2 (22-10-2026) — v1.2: `CitySearchForm` recibe un callback `onInvalid` que el controlador usa para limpiar el error previo (Req 1.7, Propiedad 16).
+> **Versión anterior:** 1.1 (22-10-2026) — cambios respecto a 1.0: parámetro `language=es` en geocodificación; `Coordinates` incorpora `region` y `country`; nueva función pura `formatLocation`; propiedades 14 y 15; pruebas de contrato con respuestas reales de Open-Meteo.
 
 ## Introducción
 
@@ -86,6 +87,7 @@ La arquitectura sigue el patrón **Separación de Responsabilidades** en capas c
 - Maneja el evento `submit` del formulario y el evento `keydown` para la tecla Enter.
 - Muestra mensajes de validación inline cuando la entrada está vacía o es solo whitespace.
 - Emite un evento `search(cityName: string)` hacia el controlador.
+- (v1.2) Si la validación falla, emite `onInvalid()`; el controlador responde con `invalidInput()`, que limpia el `ErrorMessage` sin tocar el `WeatherDisplay`.
 
 #### `WeatherDisplay`
 - Renderiza los datos del clima: nombre de ciudad, temperatura (°C), humedad (%) y precipitación (mm).
@@ -393,6 +395,14 @@ type AppState =
 *Para cualquier* par de búsquedas A y B donde B se inicia antes de que A termine, y para cualquier orden de llegada de sus respuestas, el `Weather_Display` y el mensaje de error finales DEBERÁN corresponder exclusivamente a la búsqueda B.
 
 **Validates: Requirements 4.8**
+
+---
+
+### Property 16: La validación fallida oculta errores previos (v1.2)
+
+*Para cualquier* estado previo (error visible o resultado visible) y cualquier entrada compuesta solo de espacios, tras activar el envío el único mensaje visible DEBERÁ ser el de validación y el `Weather_Display` DEBERÁ conservar su contenido previo.
+
+**Validates: Requirements 1.7**
 
 ---
 
