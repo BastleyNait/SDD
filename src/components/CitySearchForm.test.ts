@@ -12,10 +12,12 @@ describe('CitySearchForm', () => {
     fc.assert(fc.property(fc.stringOf(fc.constantFrom(' ', '\t', '\n', '\r')), (ws) => {
       root.replaceChildren();
       const onSearch = vi.fn();
-      const f = new CitySearchForm(root, onSearch);
+      const onInvalid = vi.fn();
+      const f = new CitySearchForm(root, onSearch, onInvalid);
       f.input.value = ws.replace(/[\n\r]/g, ' '); // un <input> no admite saltos de línea
       f.button.click();
       expect(onSearch).not.toHaveBeenCalled();
+      expect(onInvalid).toHaveBeenCalledTimes(1); // v1.2 — Req 1.7
       expect(root.querySelector('.validation-message')!.textContent).toBe(MSG_REQUIRED);
     }));
   });
@@ -26,10 +28,12 @@ describe('CitySearchForm', () => {
     fc.assert(fc.property(fc.stringOf(fc.constantFrom(' ', '\t')), core, fc.stringOf(fc.constantFrom(' ', '\t')), (a, c, b) => {
       root.replaceChildren();
       const onSearch = vi.fn();
-      const f = new CitySearchForm(root, onSearch);
+      const onInvalid = vi.fn();
+      const f = new CitySearchForm(root, onSearch, onInvalid);
       f.input.value = `${a}${c}${b}`;
       f.button.click();
       expect(onSearch).toHaveBeenCalledWith(f.input.value.trim());
+      expect(onInvalid).not.toHaveBeenCalled();
     }));
   });
 

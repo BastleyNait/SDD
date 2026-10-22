@@ -1,3 +1,4 @@
+import fc from 'fast-check';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CitySearchForm } from '../src/components/CitySearchForm';
 import { ErrorMessage } from '../src/components/ErrorMessage';
@@ -14,7 +15,7 @@ function mount(geoBody: unknown, fcBody: unknown, geoStatus = 200) {
   document.body.innerHTML = '<div id="s"></div><div id="l"></div><div id="e"></div><div id="d"></div>';
   const g = (id: string) => document.getElementById(id)!;
   let controller!: WeatherController;
-  const form = new CitySearchForm(g('s'), (c) => void controller.search(c));
+  const form = new CitySearchForm(g('s'), (c) => void controller.search(c), () => controller.invalidInput());
   controller = new WeatherController({
     geocoding: new GeocodingService({ fetch: async () => resp(geoBody, geoStatus) }),
     forecast: new ForecastService({ fetch: async () => resp(fcBody) }),
@@ -60,5 +61,23 @@ describe('integración E2E (clientes simulados)', () => {
     form.button.click();
     await tick();
     expect(g('e').textContent).toBe(ERROR_MESSAGES.FORECAST_INCOMPLETE_DATA);
+  });
+
+  // Feature: weather-forecast-app, Propiedad 16 — Valida: Req 1.7 (defecto hallado en la prueba en vivo)
+  it('P16: tras enviar solo espacios, el único mensaje visible es el de validación y el display se conserva', async () => {
+    await fc.assert(fc.asyncProperty(fc.boolean(), fc.stringOf(fc.constantFrom(' ', '\t')), async (prevOk, blanks) => {
+      const { form, g } = prevOk
+        ? mount({ results: [{ name: 'Arequipa', latitude: -16.4, longitude: -71.5 }] }, { current: { temperature_2m: 16.9, relative_humidity_2m: 43, precipitation: 0 } })
+        : mount({ results: [] }, {});
+      form.input.value = 'Arequipa';
+      form.button.click();
+      await tick();
+      const before = g('d').textContent;
+      form.input.value = blanks;
+      form.button.click();
+      expect(g('e').textContent).toBe('');
+      expect(g('s').querySelector('.validation-message')!.textContent).toBe('El nombre de la ciudad es obligatorio.');
+      expect(g('d').textContent).toBe(before);
+    }));
   });
 });

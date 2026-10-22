@@ -101,4 +101,15 @@ describe('WeatherController', () => {
       else { expect(deps.error.show).toHaveBeenCalledWith(ERROR_MESSAGES.GEOCODING_TIMEOUT); expect(c.state.status).toBe('error'); }
     }));
   });
+
+  it('Req 1.7 (v1.2): invalidInput() limpia el error previo y conserva el display', async () => {
+    const { deps, controller } = setup({ success: false, error: { type: 'CITY_NOT_FOUND' } }, okFc);
+    await controller.search('zzz');
+    deps.error.clear.mockClear();
+    deps.display.clear.mockClear();
+    controller.invalidInput();
+    expect(deps.error.clear).toHaveBeenCalledTimes(1);
+    expect(deps.display.clear).not.toHaveBeenCalled();
+    expect(controller.state.status).toBe('idle');
+  });
 });
