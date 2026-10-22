@@ -6,6 +6,7 @@ import {
 } from '../types';
 
 const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v);
+const str = (v: unknown): string => (typeof v === 'string' ? v : '');
 
 export class GeocodingService {
   constructor(private readonly client: GeocodingClientLike) {}
@@ -37,7 +38,7 @@ export class GeocodingService {
     if (!Array.isArray(results) || results.length === 0) {
       return { success: false, error: { type: 'CITY_NOT_FOUND' } };
     }
-    const first = results[0] as { latitude?: unknown; longitude?: unknown; name?: unknown } | null;
+    const first = results[0] as { latitude?: unknown; longitude?: unknown; name?: unknown; admin1?: unknown; country?: unknown } | null;
     if (!first || !isNum(first.latitude) || !isNum(first.longitude)) {
       return { success: false, error: { type: 'CITY_NOT_FOUND' } };
     }
@@ -47,7 +48,9 @@ export class GeocodingService {
       data: {
         latitude: first.latitude,
         longitude: first.longitude,
-        cityName: typeof first.name === 'string' ? first.name : '',
+        cityName: str(first.name),
+        region: str(first.admin1),
+        country: str(first.country),
       },
     };
   }

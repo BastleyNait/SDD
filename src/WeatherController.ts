@@ -73,7 +73,7 @@ export class WeatherController {
       if (stale()) return;
       if (!fc.success) return this.fail(forecastMessage(fc.error));
 
-      this.d.display.render(geo.data.cityName, cityName, fc.data);
+      this.d.display.render(geo.data, cityName, fc.data);
       this.state = {
         status: 'success',
         cityName: geo.data.cityName.trim() !== '' ? geo.data.cityName : cityName,

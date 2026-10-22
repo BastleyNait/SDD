@@ -2,6 +2,10 @@ export interface Coordinates {
   latitude: number;
   longitude: number;
   cityName: string;
+  /** admin1 de la Geocoding API ('' si no viene) — v1.1 */
+  region: string;
+  /** country de la Geocoding API ('' si no viene) — v1.1 */
+  country: string;
 }
 
 export interface WeatherData {

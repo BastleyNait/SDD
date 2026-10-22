@@ -229,24 +229,24 @@ Implementación de una SPA estática (HTML/CSS/TypeScript vanilla) que permite a
 - [x] 12. Punto de control final — Verificar suite completa de pruebas
   - Ejecutar `vitest --run` y asegurarse de que todas las pruebas (unitarias, de propiedad e integración) pasen sin errores. Consultar al usuario si surge alguna duda.
 
-- [ ] 13. Iteración v1.1 del spec (cambios aprobados por el usuario el 22-10-2026)
-  - [ ] 13.1 Escribir primero las pruebas de la v1.1 (deben fallar: fase ROJO)
+- [x] 13. Iteración v1.1 del spec (cambios aprobados por el usuario el 22-10-2026)
+  - [x] 13.1 Escribir primero las pruebas de la v1.1 (deben fallar: fase ROJO)
     - P3 actualizada: la URL incluye `language=es`.
     - **Propiedad 14** en `src/utils/location.test.ts` y prueba de display con región/país.
     - **Propiedad 15** en `src/WeatherController.test.ts` (dos búsquedas con orden de llegada arbitrario).
     - Pruebas de contrato con respuestas reales en `tests/contract.test.ts`.
     - _Requisitos: 2.1, 4.8, 4.9_
-  - [ ] 13.2 Extender `Coordinates` con `region` y `country`; mapear `admin1` y `country` en `GeocodingService` sin transformar
+  - [x] 13.2 Extender `Coordinates` con `region` y `country`; mapear `admin1` y `country` en `GeocodingService` sin transformar
     - _Requisitos: 4.9, 5.1_
-  - [ ] 13.3 Implementar `src/utils/formatLocation` y usarlo en `WeatherDisplay`
+  - [x] 13.3 Implementar `src/utils/formatLocation` y usarlo en `WeatherDisplay`
     - _Requisitos: 4.9_
-  - [ ] 13.4 Añadir `language=es` en `GeocodingClient`
+  - [x] 13.4 Añadir `language=es` en `GeocodingClient`
     - _Requisitos: 2.1_
-  - [ ] 13.5 Verificar que `WeatherController` descarta respuestas obsoletas (Propiedad 15)
+  - [x] 13.5 Verificar que `WeatherController` descarta respuestas obsoletas (Propiedad 15)
     - _Requisitos: 4.8_
-  - [ ] 13.6 Reforzar pruebas existentes: P5 con todas las combinaciones de campos faltantes; P8 a nivel de controlador (el mensaje nombra el servicio); usar Testing Library en `CitySearchForm`
+  - [x] 13.6 Reforzar pruebas existentes: P5 con todas las combinaciones de campos faltantes; P8 a nivel de controlador (el mensaje nombra el servicio); usar Testing Library en `CitySearchForm`
     - _Requisitos: 2.6, 3.4, 5.4, 1.1, 1.2_
-  - [ ] 13.7 Punto de control v1.1 — suite completa en verde, `tsc` sin errores, cobertura ≥ 90 % en `src/` (excepto `main.ts`)
+  - [x] 13.7 Punto de control v1.1 — suite completa en verde, `tsc` sin errores, cobertura ≥ 90 % en `src/` (excepto `main.ts`)
 
 ## Notes
 
