@@ -1,3 +1,4 @@
+import { getByLabelText, getByRole } from '@testing-library/dom';
 import fc from 'fast-check';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { CitySearchForm, MSG_REQUIRED } from './CitySearchForm';
@@ -32,15 +33,17 @@ describe('CitySearchForm', () => {
     }));
   });
 
-  it('renderiza City_Input con maxlength=100', () => {
-    const f = new CitySearchForm(root, vi.fn());
-    expect(f.input.getAttribute('maxlength')).toBe('100');
+  it('renderiza City_Input con maxlength=100 (consultado como lo haría un usuario: por su etiqueta)', () => {
+    new CitySearchForm(root, vi.fn());
+    const input = getByLabelText(root, 'Ciudad') as HTMLInputElement;
+    expect(input.getAttribute('maxlength')).toBe('100');
+    expect(getByRole(root, 'button', { name: 'Buscar' })).toBeTruthy();
   });
   it('envía con clic en el botón', () => {
     const onSearch = vi.fn();
-    const f = new CitySearchForm(root, onSearch);
-    f.input.value = ' Lima ';
-    f.button.click();
+    new CitySearchForm(root, onSearch);
+    (getByLabelText(root, 'Ciudad') as HTMLInputElement).value = ' Lima ';
+    getByRole(root, 'button', { name: 'Buscar' }).click();
     expect(onSearch).toHaveBeenCalledWith('Lima');
   });
   it('envía con Enter mientras City_Input está enfocado (una sola vez)', () => {

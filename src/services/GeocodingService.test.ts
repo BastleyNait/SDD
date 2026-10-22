@@ -15,11 +15,12 @@ const svc = (r: HttpResponse | Error) =>
 
 describe('GeocodingClient URL', () => {
   // Feature: weather-forecast-app, Propiedad 3: URL de geocodificación
-  it('P3: contiene name URL-encoded y count=1', () => {
+  it('P3: contiene name URL-encoded, count=1 y language=es (v1.1)', () => {
     fc.assert(fc.property(fc.string({ minLength: 1 }), (name) => {
       const url = new URL(buildGeocodingUrl(name));
       expect(url.searchParams.get('name')).toBe(name);
       expect(url.searchParams.get('count')).toBe('1');
+      expect(url.searchParams.get('language')).toBe('es');
       expect(buildGeocodingUrl(name)).toContain(`name=${encodeURIComponent(name)}`);
     }));
   });
@@ -29,22 +30,22 @@ describe('GeocodingService', () => {
   // Feature: weather-forecast-app, Propiedad 4: extracción de coordenadas
   it('P4: extrae lat/lon del primer resultado sin transformar', async () => {
     await fc.assert(fc.asyncProperty(
-      fc.record({ latitude: fc.double({ noNaN: true, noDefaultInfinity: true }), longitude: fc.double({ noNaN: true, noDefaultInfinity: true }), name: fc.string() }),
+      fc.record({ latitude: fc.double({ noNaN: true, noDefaultInfinity: true }), longitude: fc.double({ noNaN: true, noDefaultInfinity: true }), name: fc.string(), admin1: fc.string(), country: fc.string() }),
       async (r) => {
         const res = await svc(resp({ results: [r, { latitude: 1, longitude: 2, name: 'otro' }] })).geocode('x');
-        expect(res).toEqual({ success: true, data: { latitude: r.latitude, longitude: r.longitude, cityName: r.name } });
+        expect(res).toEqual({ success: true, data: { latitude: r.latitude, longitude: r.longitude, cityName: r.name, region: r.admin1, country: r.country } });
       }));
   });
 
   // Feature: weather-forecast-app, Propiedad 5: coordenadas faltantes
-  it('P5: lat/lon null/undefined/ausentes → CITY_NOT_FOUND', async () => {
-    const missing = fc.constantFrom(null, undefined, 'ausente');
-    await fc.assert(fc.asyncProperty(missing, missing, async (la, lo) => {
+  it('P5: lat y/o lon null/undefined/ausentes → CITY_NOT_FOUND (todas las combinaciones)', async () => {
+    // Cada campo puede ser válido, null, undefined o no existir; se exige que al menos uno falte.
+    const field = fc.constantFrom<unknown>(-16.4, null, undefined, 'ausente');
+    await fc.assert(fc.asyncProperty(field, field, async (la, lo) => {
+      fc.pre(la !== -16.4 || lo !== -16.4);
       const r: Record<string, unknown> = { name: 'X' };
       if (la !== 'ausente') r.latitude = la;
       if (lo !== 'ausente') r.longitude = lo;
-      // al menos uno debe faltar: forzamos latitude faltante
-      r.latitude = la === 'ausente' ? undefined : la;
       const res = await svc(resp({ results: [r] })).geocode('x');
       expect(res).toEqual({ success: false, error: { type: 'CITY_NOT_FOUND' } });
     }));
@@ -79,7 +80,7 @@ describe('GeocodingService', () => {
   });
   it('éxito con un resultado válido', async () => {
     const res = await svc(resp({ results: [{ name: 'Arequipa', latitude: -16.4, longitude: -71.5 }] })).geocode('Arequipa');
-    expect(res).toEqual({ success: true, data: { latitude: -16.4, longitude: -71.5, cityName: 'Arequipa' } });
+    expect(res).toEqual({ success: true, data: { latitude: -16.4, longitude: -71.5, cityName: 'Arequipa', region: '', country: '' } });
   });
 });
 
