@@ -20,7 +20,11 @@ const loading = new LoadingIndicator(el('loading'));
 const error = new ErrorMessage(el('error'));
 
 let controller: WeatherController;
-const form = new CitySearchForm(el('search'), (city) => void controller.search(city));
+const form = new CitySearchForm(
+  el('search'),
+  (city) => void controller.search(city),
+  () => controller.invalidInput(), // v1.2 — Req 1.7
+);
 controller = new WeatherController({
   geocoding: new GeocodingService(new GeocodingClient()),
   forecast: new ForecastService(new ForecastClient()),

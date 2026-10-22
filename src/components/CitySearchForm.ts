@@ -6,7 +6,11 @@ export class CitySearchForm {
   readonly button: HTMLButtonElement;
   private readonly validation: HTMLParagraphElement;
 
-  constructor(root: HTMLElement, private readonly onSearch: (cityName: string) => void) {
+  constructor(
+    root: HTMLElement,
+    private readonly onSearch: (cityName: string) => void,
+    private readonly onInvalid: () => void = () => {}, // v1.2 — Req 1.7
+  ) {
     this.form = document.createElement('form');
     this.form.noValidate = true;
     this.form.setAttribute('aria-label', 'Buscar clima');
@@ -50,6 +54,7 @@ export class CitySearchForm {
     const value = this.input.value.trim();
     if (value === '') {
       this.validation.textContent = MSG_REQUIRED;
+      this.onInvalid();
       return;
     }
     this.validation.textContent = '';

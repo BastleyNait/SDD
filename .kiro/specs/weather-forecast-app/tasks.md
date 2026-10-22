@@ -247,12 +247,12 @@ Implementación de una SPA estática (HTML/CSS/TypeScript vanilla) que permite a
   - [x] 13.6 Reforzar pruebas existentes: P5 con todas las combinaciones de campos faltantes; P8 a nivel de controlador (el mensaje nombra el servicio); usar Testing Library en `CitySearchForm`
     - _Requisitos: 2.6, 3.4, 5.4, 1.1, 1.2_
   - [x] 13.7 Punto de control v1.1 — suite completa en verde, `tsc` sin errores, cobertura ≥ 90 % en `src/` (excepto `main.ts`)
-- [ ] 14. Iteración v1.2 (defecto hallado en prueba en vivo; decisión del usuario: limpiar solo el error previo)
-  - [ ] 14.1 Pruebas primero (ROJO): `onInvalid` en `CitySearchForm` (P1 extendida), `invalidInput()` en el controlador, Propiedad 16 en integración reproduciendo el defecto
+- [x] 14. Iteración v1.2 (defecto hallado en prueba en vivo; decisión del usuario: limpiar solo el error previo)
+  - [x] 14.1 Pruebas primero (ROJO): `onInvalid` en `CitySearchForm` (P1 extendida), `invalidInput()` en el controlador, Propiedad 16 en integración reproduciendo el defecto
     - _Requisitos: 1.7_
-  - [ ] 14.2 Implementar `onInvalid` en `CitySearchForm` y `invalidInput()` en `WeatherController`; cablear en `main.ts`
+  - [x] 14.2 Implementar `onInvalid` en `CitySearchForm` y `invalidInput()` en `WeatherController`; cablear en `main.ts`
     - _Requisitos: 1.7_
-  - [ ] 14.3 Punto de control v1.2 — suite completa en verde y re-prueba en vivo del escenario del defecto
+  - [x] 14.3 Punto de control v1.2 — suite completa en verde y re-prueba en vivo del escenario del defecto
 
 ## Notes
 

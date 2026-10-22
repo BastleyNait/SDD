@@ -85,6 +85,12 @@ export class WeatherController {
     }
   }
 
+  /** Req 1.7 (v1.2): la validación falló → ocultar el error previo; el display conserva el último resultado. */
+  invalidInput(): void {
+    this.d.error.clear();
+    if (this.state.status === 'error') this.state = { status: 'idle' };
+  }
+
   private fail(message: string): void {
     this.d.loading.hide();
     this.d.error.show(message);
